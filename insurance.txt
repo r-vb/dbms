@@ -1,0 +1,107 @@
+Create Table Person
+(  driver_id varChar(6) primary key,
+   driver_name  varChar(30),
+   driver_address varChar(30)
+);
+
+Create Table Car
+(  reg_no varChar(30) primary key,
+   model varChar(30),
+   year number
+);
+   
+Create Table Accident
+(  report_no number(6) primary key,
+   acc_date date,
+   location varChar(30)
+);
+
+Create Table Owns
+(  driver_id varChar(30) not null,
+   reg_no varChar(30),
+   foreign key(driver_id) references Person(driver_id),
+   foreign key(reg_no) references Car(reg_no)
+); 
+
+Create Table Participated
+(  driver_id varChar(30) not null,
+   reg_no varChar(30),
+   report_no number(6),
+   damage_amt number(6),
+   foreign key(driver_id) references Person(driver_id),
+   foreign key(reg_no) references Car(reg_no),
+   foreign key(report_no) references Accident(report_no)
+);
+
+
+1.insert into Person values('&driver_id','&driver_name','&driver_address');
+
+2.insert into Car values('&reg_no','&model','&year');
+
+3.insert into Accident values('&report_no','&acc_date','&location');
+
+4.insert into Owns values('&driver_id','&reg_no');
+
+5.insert into Participated values('&driver_id','&reg_no','&report_no','&damage_amt');
+
+query3a-:update Participated set damage_amt=25000 where reg_no='ka24' AND report_no=12;
+
+query4-: select count(report_no) as Number_Of_People from Accident a,Participated p,Owns o where p.driver_id=o.driver_id and a.report_no=p.report_no and a.acc_date like '_______02';
+
+query5-:select count(*) from Participated p where p.reg_no=(select c.reg_no from Car c where c.model='suzuki');
+
+query5-:select count(*) from Car c,Participated p where p.reg_no=c.reg_no and c.model='Maruti';
+
+query6-:select a.report_no as Report_NO,count(p.driver_id) as NumberofCars from Accident a JOIN Participated p ON a.report_no=p.report_no Group By a.report_no 
+
+query7-:select a.report_no as Report_No,Sum(damage_amt) as Total_Damage_Amount from Participated p,Accident a where a.report_no=p.report_no Group By a.report_no
+
+query8-: SELECT report_no
+FROM Participated
+GROUP BY report_no
+HAVING SUM(damage_amt) = (
+    SELECT MAX(total_damage)
+    FROM (
+        SELECT SUM(damage_amt) AS total_damage
+        FROM Participated
+        GROUP BY report_no
+    )
+);
+
+
+  
+query9-:SELECT p.reg_no,p.damage_amt
+FROM Participated p
+WHERE p.report_no ='14' and damage_amt= (
+    SELECT MAX(damage_amt)
+    FROM Participated
+    WHERE report_no = '14'
+);
+
+query10-:select driver_id as Driver_Id , count(*) as NumberOfTime_MetWithAccident from Participated Group By driver_id
+
+query11-:select c.reg_no from Car c where not exists(select * from Participated p where c.reg_no=p.reg_no)   
+
+query12-:select driver_id as Driver_Id,reg_no as Reg_no,count(*) from Participated Group By driver_id,reg_no Having count(*)>=2
+
+query13-:select acc_date as Accident_Date,Count(*) as NumberOfTimes from Accident where acc_date LIKE '_______02' Group By(acc_date) Order By acc_date
+
+query14-:select reg_no as CarNumber,Count(*) as NumberOfTimes_MetWithAccident,Sum(damage_amt) as Total_Amount,Avg(damage_amt) as Average_Amount from Participated Group By(reg_no) 
+
+query15-:
+SELECT DISTINCT p.driver_name, p.driver_address
+FROM Person p JOIN Participated pa ON p.driver_id = pa.driver_id
+WHERE NOT EXISTS (SELECT *
+                  FROM Owns o
+                  WHERE o.driver_id = pa.driver_id
+                  AND o.reg_no = pa.reg_no);
+
+quer16:List the cars that have not met with accidents along with their owners
+answer-:
+SELECT  c.reg_no
+FROM Owns o
+JOIN Car c ON o.reg_no = c.reg_no
+WHERE c.reg_no NOT IN (
+    SELECT p.reg_no
+    FROM Participated p
+);

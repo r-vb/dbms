@@ -1,0 +1,112 @@
+Create Table Customer
+( cust_id number(6) primary key,
+  cust_name varChar(30),
+  cust_city varChar(30)
+);
+
+Create Table Order_Table
+( order_id number(6) primary key,
+  o_date date,
+  cust_id number(6),
+  ord_amount number(10),
+  foreign key (cust_id) references Customer(cust_id)
+);
+  
+Create Table Item
+( item_no number(6) primary key,
+  price number(30)
+);
+
+Create Table OrderItem
+( order_id number(6),
+  item_no number(6),
+  qty number(6),
+  foreign key (order_id) references Order_Table(order_id),
+  foreign key (item_no) references Item(item_no)
+);
+
+Create Table Warehouse
+(  warehouse number(6) primary key,
+   city varChar(30)
+);
+
+Create Table Shipment
+( order_id number(6),
+  warehouse number(6),
+  ship_date date,
+  foreign key (order_id) references Order_Table(order_id),
+  foreign key (warehouse) references Warehouse(warehouse)
+);
+
+insert into Customer values('&cust_id','&cust_name','&cust_city')
+
+insert into Order_Table values('&order_id','&o_date','&cust_id','&ord_amount')
+
+insert into Item values('&item_no','&price')
+
+insert into OrderItem values('&order_id','&item_no','&qty')
+
+insert into Warehouse values('&warehouse','&city')
+
+insert into Shipment values('&order_id','&warehouse','&ship_date')
+
+query3-:select c.cust_name,count(*),AVG(o.ord_amount) from Customer c,Order_Table o where c.cust_id=o.cust_id Group By c.cust_name
+
+query4-:select s.order_id,w.city from Warehouse w,Shipment s where w.warehouse=s.warehouse and w.city='bgm'
+
+query5-:update OrderItem set item_no=null where item_no='111'
+
+query6-:select order_id ,Max(qty) from OrderItem Group By order_id Having Max(qty)=(select Max(qty) from OrderItem)
+
+query7-:select warehouse from Shipment Group By warehouse Having count(order_id)=(select Max(Orders) from(select warehouse,count(order_id) as Orders from Shipment Group By warehouse Order By warehouse))
+
+query8-:select o_date,Sum(ord_amount) from Order_Table where o_date like '_______05' Group By o_date Order By o_date
+
+
+query9-:
+    SELECT c.cust_name, SUM(o.ord_amount) AS total_order_amount
+    FROM Customer c
+    JOIN Order_Table o ON c.cust_id = o.cust_id
+    GROUP BY c.cust_name
+    HAVING SUM(o.ord_amount) = (SELECT MAX(total_amount)
+                                FROM (SELECT SUM(ord_amount) AS total_amount
+                                      FROM Order_Table
+                                      GROUP BY cust_id
+                                     )
+                               );
+
+query10-:SELECT DISTINCT i.item_no
+         FROM Item i
+         WHERE i.item_no Not In (SELECT oi.item_no
+                                 FROM OrderItem oi
+                                 JOIN Order_Table o ON oi.order_id = o.order_id
+                                 WHERE oi.item_No = i.item_no
+                                AND o.o_date LIKE '_______01'
+                                );
+
+query11-:select c.cust_city,Count(*) as City
+         from Customer c,Order_Table o,OrderItem oi
+         where oi.item_no='222' and oi.order_id=o.order_id and c.cust_id=o.cust_id
+         Group By c.cust_city
+         Having count(*)= (select Min(City) from(select Count(c.cust_city) as City
+                                                 from Customer c,Order_Table o,OrderItem oi
+                                                 where oi.item_no='222' and oi.order_id=o.order_id and c.cust_id=o.cust_id
+                                                 Group By c.cust_city))
+
+
+query12-:select c.cust_id,c.cust_name,c.cust_city
+         from Customer c,Order_Table o,Shipment s,Warehouse w
+         where c.cust_id=o.cust_id and o.order_id=s.order_id and s.warehouse=w.warehouse and w.city=c.cust_city
+         Group By c.cust_id,c.cust_name,c.cust_city
+         
+
+                          
+query14-:select c.cust_id,c.cust_name,c.cust_city
+         from Customer c,Order_Table o,Shipment s,Warehouse w
+         where c.cust_id=o.cust_id and o.order_id=s.order_id and s.warehouse=w.warehouse and w.city=c.cust_city
+         Group By c.cust_id,c.cust_name,c.cust_city  
+         Having count(*)>=1
+         
+
+                                
+  

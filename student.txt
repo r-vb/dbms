@@ -1,0 +1,165 @@
+Create Table Student
+(  reg_no varChar(30) primary key,
+   name varChar(30),
+   major varChar(30),
+   bdate date
+);
+
+Create Table Course
+(  c_no number(6) primary key,
+   c_name varChar(30),
+   dept varChar(30)
+);
+
+Create Table Enroll
+(  reg_no varChar(30),
+   c_no number(6),
+   sem number(6),
+   marks number(6),
+   primary key(reg_no,c_no),
+   foreign key(reg_no) references Student(reg_no),
+   foreign key(c_no) references Course(c_no)
+);
+
+Create Table TextBook
+(  b_Isbn number(6) primary key,
+   b_title varChar(30),
+   publisher varChar(30),
+   author varChar(30)
+);
+
+Create Table Book_Adopt
+(  c_no number(6),
+   b_Isbn number(6),
+   sem number(6),
+   primary key(c_no,b_Isbn),
+   foreign key(c_no) references Course(c_no),
+   foreign key(b_Isbn) references TextBook(b_Isbn)
+);
+   
+Student Table:insert into Student values('&reg_no','&name','&major','&bdate')
+
+Course Table:insert into Course values('&c_no','&c_name','&dept')
+
+Enroll Table:insert into Enroll values('&reg_no','&c_no','&sem','&marks')
+
+Book_Adopt Table:insert into Book_Adopt values('&c_no','&b_Isbn','&sem')
+
+TextBook Table:insert into TextBook values('&b_Isbn','&b_title','&publisher','&author')
+
+
+query3-:insert into TextBook values('6','DSA','Bharat','Padma')
+        insert into Book_Adopt values('1003','6','3')
+
+query4-:select c.c_no,b.b_Isbn,b_title 
+        from Course c , Book_Adopt b ,TextBook t 
+        where b.b_Isbn=t.b_Isbn
+        and c.c_no=b.c_no 
+        and c.dept='Chemical' 
+        and c.c_no IN(select c.c_no
+                      from Course c,Book_Adopt b,TextBook t
+                      where c.c_no=b.c_no and b.b_Isbn=t.b_Isbn 
+                      and c.dept='Chemical'
+                      Group By c.c_no 
+                      Having Count(*)>2)
+        Order By c.c_no
+        
+query5-:select dept,publisher
+        from Course c,Book_Adopt b,TextBook t
+        where t.publisher='Pearson'
+        and t.b_Isbn=b.b_Isbn
+        and b.c_no=c.c_no
+
+query6-:select s.reg_no,s.name
+        from Student s,Enroll e
+        where s.reg_no=e.reg_no
+        Group By s.reg_no,s.name
+        Having Count(e.c_no)=(Select Max(course_count)
+                              from(select count(c_no) as course_count 
+                                   from Enroll
+                                   Group By reg_no))
+      
+query7-:select t.b_Isbn,t.b_title
+        from TextBook t 
+        where t.b_Isbn NOT IN(select b.b_Isbn
+                               from Book_Adopt b)
+
+query8-:SELECT b.b_Isbn
+FROM Book_Adopt b
+JOIN Course c ON b.c_no = c.c_no
+WHERE c.dept = 'Mechanical' AND b.b_Isbn IN (
+    SELECT b_Isbn
+    FROM Book_Adopt b
+    JOIN Course c ON b.c_no = c.c_no
+    WHERE c.dept = 'Chemical'
+);
+
+query9-:select t.b_title,t.b_Isbn
+From TextBook t
+where t.b_Isbn In(SELECT b.b_Isbn
+                  FROM Book_Adopt b JOIN Course c ON b.c_no = c.c_no
+                  WHERE c.dept = 'Mechanical' AND b.b_Isbn IN (SELECT b_Isbn
+                                                               FROM Book_Adopt b 
+                                                               JOIN Course c ON b.c_no = c.c_no
+                                                               WHERE c.dept = 'Chemical'
+                                                               ));
+
+query10-:(select c.dept
+        from Course c,Book_Adopt b,TextBook t
+        where t.publisher='Pearson'
+        and t.b_Isbn=b.b_Isbn
+        and b.c_no=c.c_no)
+        Union
+        (select c.dept 
+         from Course c Join Book_Adopt b On c.c_no=b.c_no 
+         Group By c.c_no,c.dept
+         Having Count(b.c_no)=(select Max(Course) from(select count(c_no) as Course 
+                                                       from Book_Adopt
+                                                       Group By c_no)));
+
+query11-:select t.publisher,t.b_Isbn
+         from TextBook t
+         where t.publisher In(select publisher
+                              from TextBook
+                              Group by Publisher
+                              Having Count(Publisher)>=2)
+         Order By t.publisher ASC,t.b_Isbn DESC;
+
+
+query12-:
+(select c.dept
+from Course c Join Enroll e On c.c_no=e.c_no
+Group By c.dept
+Having Count(c.c_no)>=5)
+INTERSECT
+(select c.dept
+ from Course c JOIN Book_Adopt b On c.c_no=b.c_no
+ Group By c.dept
+ Having Count(c.c_no)>=2)
+
+query13-:(select e.c_no 
+         from Enroll e
+         Group By e.c_no
+         Having count(e.c_no)=(select MIN(Courses) 
+                               from(select Count(e.c_no) as Courses
+                                    from Enroll e
+                                    Group By e.c_no)))
+         INTERSECT
+         (select b.c_no
+         from Book_Adopt b
+         Group By b.c_no
+         Having Count(b.c_no)=(select MAX(Books) 
+                              from(select count(b.c_no) as Books
+                                   from Book_Adopt b
+                                   Group By b.c_no)))
+
+         
+query14-:select b.c_no,t.b_Isbn,t.b_title,t.author
+         from Book_Adopt b Join TextBook t On b.b_Isbn=t.b_Isbn
+         where t.author In  (select author
+                             from  TextBook  
+                             Group By author
+                             Having Count(*)>1)
+        Group By b.c_no,t.b_Isbn,t.b_title,t.author
+
+
