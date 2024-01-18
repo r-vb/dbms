@@ -1,4 +1,4 @@
-library
+>>library
 
 create table book(
 	book_id int NOT NULL,
@@ -110,7 +110,7 @@ d) select book_id,title
 
 -----------------------------------------------------------------------------------
 
-hospital managment
+>>hospital managment
 
 create table patient 
 (
@@ -234,7 +234,7 @@ WHERE dp.ssid = (
 
 -----------------------------------------------------------------------------------
 
-universitydb
+>>universitydb
 
 create table student(
 	sid varchar(8) primary key,
@@ -419,7 +419,7 @@ WHERE courseno NOT IN (
 );
 
 --------------------------------------------------------------------------------
-supply chain 
+>>supply chain 
 
 create table supplier(
 	snum int not null,
