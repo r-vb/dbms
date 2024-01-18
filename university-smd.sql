@@ -143,14 +143,6 @@ where iid in(select t.iid
 
 d)
 select course_no,title
-from course1
-where course_no NOT IN(
-			select e.course_no
-			from enrolls1 e
-			join course_offerings1 c on e.course_no=c.course_no
-			where year='2024' 
-			);
-select course_no,title
    from course1 u
    where course_no IN ( select course_no
 			from course_offerings1
