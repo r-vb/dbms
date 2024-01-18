@@ -1,13 +1,13 @@
 UNIVERSITY:
 
-Create Table Student(
+Create Table Student1(
 			sid VARCHAR(20) NOT NULL,
 			Name VARCHAR(20) NOT NULL,
 			Program VARCHAR(20) NOT NULL,
 		        Primary Key(sid)
 		     );
 
-Create Table Course(
+Create Table Course1(
 			course_no VARCHAR(10) NOT NULL,
 			credits INT NOT NULL,
 			TITLE VARCHAR(20) NOT NULL,
@@ -16,7 +16,7 @@ Create Table Course(
 		        PRIMARY KEY(course_no)
 		    );
 
-Create Table Instructor(
+Create Table Instructor1(
 			 iid VARCHAR(10) NOT NULL,
 			 NAME VARCHAR(20) NOT NULL,
 			 DEPT VARCHAR(10) NOT NULL,
@@ -24,7 +24,7 @@ Create Table Instructor(
 			 PRIMARY KEY(iid)
 			);
 
-Create Table Course_offerings(
+Create Table Course_offerings1(
 				Room VARCHAR(5) NOT NULL,
 				Year VARCHAR(10) NOT NULL,
 				SEM VARCHAR(20) NOT NULL,
@@ -35,7 +35,7 @@ Create Table Course_offerings(
 
 
 
-CREATE TABLE teaches (
+CREATE TABLE teaches1(
     iid VARCHAR(10) NOT NULL, 
     Year VARCHAR(10) NOT NULL,
     SEM VARCHAR(20) NOT NULL, 
@@ -45,7 +45,7 @@ CREATE TABLE teaches (
     FOREIGN KEY (Year, SEM, course_no) REFERENCES Course_offerings(Year, SEM, course_no) ON DELETE SET NULL
 );
 
-Create Table enrolls(
+Create Table enrolls1(
 			sid VARCHAR(20) NOT NULL,
 			Year VARCHAR(10) NOT NULL,
     			SEM VARCHAR(20) NOT NULL, 
