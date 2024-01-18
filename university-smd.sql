@@ -118,24 +118,24 @@ INSERT INTO enrolls VALUES ('s1', '2024', 'Spring', 'c6', 'A');
 queries
 
 a) select u.sid,u.course_no,c.Pcourse
-   from enrolls u,course c
+   from enrolls1 u,course1 c
    where u.course_no=c.course_no;
 
 b)
 SELECT DISTINCT s.sid, s.name
-FROM student s
-JOIN enrolls e ON s.sid = e.sid
-JOIN Course_offerings c ON e.course_no = c.course_no
+FROM student1 s
+JOIN enrolls1 e ON s.sid = e.sid
+JOIN Course_offerings1 c ON e.course_no = c.course_no
 WHERE c.sem = 'Spring'
 GROUP BY s.sid, s.name
-HAVING COUNT(DISTINCT e.course_no) = (SELECT COUNT(course_no) FROM Course_offerings WHERE sem = 'Spring');
+HAVING COUNT(DISTINCT e.course_no) = (SELECT COUNT(course_no) FROM Course_offerings1 WHERE sem = 'Spring');
 
 c)
 SELECT iid,name
-from instructor 
+from instructor1 
 where iid in(select t.iid
-	     from teaches t
-	     join instructor a on t.iid=a.iid
+	     from teaches1 t
+	     join instructor1 a on t.iid=a.iid
 	     where t.sem='Spring'
 	     group by t.iid
 	     having count(course_no)>=2
@@ -143,16 +143,16 @@ where iid in(select t.iid
 
 d)
 select course_no,title
-from course
+from course1
 where course_no NOT IN(
 			select e.course_no
-			from enrolls e
-			join course_offerings c on e.course_no=c.course_no
+			from enrolls1 e
+			join course_offerings1 c on e.course_no=c.course_no
 			where year='2024' 
 			);
 select course_no,title
-   from course u
+   from course1 u
    where course_no IN ( select course_no
-			from course_offerings
+			from course_offerings1
 			 where year='2024' AND course_no NOT IN ( select course_no
-								   from enrolls));
+								   from enrolls1));
